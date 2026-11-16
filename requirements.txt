@@ -1,0 +1,3 @@
+# Core inspection scripts use only the Python standard library.
+# Optional test dependency:
+pytest>=8.0,<9.0
