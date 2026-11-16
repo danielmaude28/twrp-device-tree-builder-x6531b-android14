@@ -25,6 +25,15 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def is_all_zero(path: Path) -> bool:
+    """Return True when an image is a zero-filled placeholder."""
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            if any(chunk):
+                return False
+    return path.stat().st_size > 0
+
+
 def inspect_magic(path: Path) -> str:
     with path.open("rb") as stream:
         magic = stream.read(8)
@@ -63,6 +72,7 @@ def main() -> int:
             "size_bytes": path.stat().st_size,
             "sha256": sha256(path),
             "magic": inspect_magic(path),
+            "content_status": "zero_filled_placeholder" if is_all_zero(path) else "present",
         })
 
     report = {
@@ -81,6 +91,15 @@ def main() -> int:
             image = args.input / name
             if not image.is_file():
                 continue
+            if is_all_zero(image):
+                report["unpack_results"].append({
+                    "image": name,
+                    "status": "skipped_zero_filled_placeholder",
+                    "returncode": None,
+                    "output_directory": None,
+                })
+                print(f"INFO: skipping zero-filled placeholder {name}")
+                continue
             destination = args.output / image.stem
             destination.mkdir(parents=True, exist_ok=True)
             command = [
@@ -93,6 +112,7 @@ def main() -> int:
             (destination / "stderr.txt").write_text(result.stderr, encoding="utf-8")
             report["unpack_results"].append({
                 "image": name,
+                "status": "unpacked" if result.returncode == 0 else "failed",
                 "returncode": result.returncode,
                 "output_directory": str(destination),
             })
