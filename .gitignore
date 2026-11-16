@@ -1,0 +1,16 @@
+# Firmware and device-specific binary inputs
+firmware/
+*.img
+*.bin
+*.ko
+
+# Generated analysis/build output
+output/
+work/
+reports/
+*.log
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+.env
