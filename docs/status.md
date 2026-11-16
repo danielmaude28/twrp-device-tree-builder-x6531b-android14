@@ -18,6 +18,9 @@ device-tree candidate; it does not include building or flashing TWRP Recovery.
 ## Repository materials now present
 
 - Firmware inventory script and unit tests.
+- DTBO table header/entry parser with structural bounds checks.
+- Kernel module ELF architecture and embedded vermagic/dependency string inventory.
+- Firmware blob (.bin) size and SHA-256 inventory.
 - Workflow to download every release asset and verify the GitHub-published
   size and SHA-256 digest before inspection.
 - AOSP unpack_bootimg.py integration for boot, init_boot and vendor_boot.
