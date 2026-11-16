@@ -1,0 +1,64 @@
+name: Firmware inspection
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag in danielmaude28/twrp-x6531
+        required: true
+        default: dump1
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout builder
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install extraction tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cpio lz4 device-tree-compiler
+
+      - name: Download stock firmware release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          mkdir -p firmware
+          gh release download "$RELEASE_TAG" \
+            --repo danielmaude28/twrp-x6531 \
+            --pattern "*.img" \
+            --dir firmware
+
+      - name: Obtain AOSP boot image inspection utility
+        run: |
+          git clone --depth 1 https://android.googlesource.com/platform/system/tools/mkbootimg "$RUNNER_TEMP/mkbootimg"
+          test -f "$RUNNER_TEMP/mkbootimg/unpack_bootimg.py"
+
+      - name: Inventory and unpack boot images
+        run: |
+          python scripts/inspect_firmware.py \
+            --input firmware \
+            --output reports \
+            --unpack-bootimg "$RUNNER_TEMP/mkbootimg/unpack_bootimg.py"
+
+      - name: Upload inspection report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: x6531b-android14-firmware-inspection
+          path: |
+            reports/
+            firmware/
+          if-no-files-found: warn
+          retention-days: 14
