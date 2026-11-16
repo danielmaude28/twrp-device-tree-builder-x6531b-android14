@@ -38,7 +38,8 @@ primary evidence. Android 12 community trees are comparison material only.
 - Required images: boot.img, init_boot.img, vendor_boot.img and dtbo.img.
 - Additional release assets: kernel modules (.ko) and firmware blobs (.bin).
 - Release API metadata and SHA-256 verification for every downloaded asset.
-- AOSP unpack_bootimg.py output for boot-related images.\n- DTBO table header and entry parser plus .ko / .bin inventory.
+- AOSP unpack_bootimg.py output for boot-related images.
+- DTBO table header and entry parser plus .ko / .bin inventory.
 - Read-only ADB/root collection guide: docs/device-data-collection.md.
 - Evidence and confidence tracking: docs/evidence-matrix.md.
 
