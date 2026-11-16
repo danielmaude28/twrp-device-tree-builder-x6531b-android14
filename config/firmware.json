@@ -1,0 +1,30 @@
+{
+  "device": {
+    "manufacturer": "Infinix",
+    "model": "Hot 50i",
+    "codename": "X6531B",
+    "android_version_target": 14
+  },
+  "source": {
+    "repository": "danielmaude28/twrp-x6531",
+    "release_tag": "dump1",
+    "release_url": "https://github.com/danielmaude28/twrp-x6531/releases/tag/dump1"
+  },
+  "required_images": [
+    "boot.img",
+    "init_boot.img",
+    "vendor_boot.img",
+    "dtbo.img"
+  ],
+  "additional_assets": [
+    "adaptive-ts.ko",
+    "novatek_mp.bin",
+    "novatek_nt36xxx.ko",
+    "novatek_ts_fw_00.bin"
+  ],
+  "notes": [
+    "The dump is expected to come from the target handset using temporary root access.",
+    "Do not assume Android 12 community configuration is valid for Android 14.",
+    "Do not finalize offsets, fstab entries, encryption settings or module compatibility without inspecting the actual firmware."
+  ]
+}
