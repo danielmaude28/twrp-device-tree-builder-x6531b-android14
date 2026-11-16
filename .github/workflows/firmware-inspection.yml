@@ -34,16 +34,23 @@ jobs:
       - name: Run unit tests
         run: python -m pytest -q
 
-      - name: Download stock firmware release assets
+      - name: Download every asset and release metadata
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
-          mkdir -p firmware
+          mkdir -p firmware reports
+          gh api "repos/danielmaude28/twrp-x6531/releases/tags/$RELEASE_TAG" > reports/release-metadata.json
           gh release download "$RELEASE_TAG" \
             --repo danielmaude28/twrp-x6531 \
-            --pattern "*.img" \
             --dir firmware
+
+      - name: Verify release asset sizes and SHA-256
+        run: |
+          python scripts/verify_release_assets.py \
+            --release-json reports/release-metadata.json \
+            --input firmware \
+            --output reports/asset-verification.json
 
       - name: Obtain AOSP boot image inspection utility
         run: |
@@ -57,7 +64,7 @@ jobs:
             --output reports \
             --unpack-bootimg "$RUNNER_TEMP/mkbootimg/unpack_bootimg.py"
 
-      - name: Upload inspection report
+      - name: Upload inspection report and source inputs
         if: always()
         uses: actions/upload-artifact@v4
         with:
