@@ -64,6 +64,11 @@ jobs:
             --output reports \
             --unpack-bootimg "$RUNNER_TEMP/mkbootimg/unpack_bootimg.py"
 
+      - name: Inspect DTBO table and inventory modules
+        run: |
+          python scripts/inspect_dtbo.py --input firmware/dtbo.img --output reports/dtbo-inventory.json
+          python scripts/inspect_modules.py --input firmware --output reports/module-inventory.json
+
       - name: Upload inspection report and source inputs
         if: always()
         uses: actions/upload-artifact@v4
