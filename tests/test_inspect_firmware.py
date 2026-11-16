@@ -2,7 +2,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from scripts.inspect_firmware import inspect_magic, sha256
+from scripts.inspect_firmware import inspect_magic, is_all_zero, sha256
 from scripts.verify_release_assets import main as verify_main
 
 
@@ -16,6 +16,19 @@ def test_android_magic(tmp_path: Path):
     sample = tmp_path / "boot.img"
     sample.write_bytes(b"ANDROID!" + bytes(8))
     assert inspect_magic(sample) == "ANDROID!"
+
+
+def test_zero_filled_placeholder(tmp_path: Path):
+    sample = tmp_path / "init_boot.img"
+    sample.write_bytes(bytes(8192))
+    assert is_all_zero(sample) is True
+    assert inspect_magic(sample) == "0000000000000000"
+
+
+def test_nonzero_image_is_not_placeholder(tmp_path: Path):
+    sample = tmp_path / "boot.img"
+    sample.write_bytes(b"ANDROID!" + bytes(8))
+    assert is_all_zero(sample) is False
 
 
 def test_unknown_magic(tmp_path: Path):
